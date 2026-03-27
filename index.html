@@ -14,28 +14,26 @@
         };
     </script>
     <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- SheetJS for Excel export -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Roboto', sans-serif; background: radial-gradient(circle, #1e3a8a 0%, #000000 100%); color: white; min-height: 100vh; overflow-y: auto; font-size: 19px; margin: 0; }
         #app { min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 10; }
-        .sidebar { width: 180px; flex-shrink: 0; border-left: 2px solid #3b82f6; background: rgba(15, 23, 42, 0.95); }
+        .sidebar { width: 175px; flex-shrink: 0; border-left: 2px solid #3b82f6; background: rgba(15, 23, 42, 0.95); }
         
-        /* Tối ưu khung câu hỏi nhỏ gọn hơn */
+        /* Câu hỏi: Tối ưu kích thước khung và cỡ chữ hài hòa */
         .question-container {
             background: rgba(30, 58, 138, 0.9);
             border: 2px solid #60a5fa;
             border-radius: 20px;
-            padding: 15px 25px;
-            margin-bottom: 12px;
-            min-height: 90px;
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 1.1rem; /* Giảm cỡ chữ câu hỏi */
+            font-size: 1.05rem;
             line-height: 1.4;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             color: #ffffff;
@@ -47,31 +45,30 @@
             border-radius: 9999px;
             transition: all 0.2s;
             text-align: left;
-            padding: 8px 20px;
+            padding: 8px 18px;
             cursor: pointer;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             width: 100%;
-            font-size: 0.9em;
+            font-size: 0.9rem;
             touch-action: manipulation;
         }
         .option-btn:hover { background: #fbbf24; color: black; transform: scale(1.01); }
         .option-btn.selected { background: #f59e0b; color: white; border-color: #fff; box-shadow: 0 0 10px #f59e0b; }
         .option-btn.hidden-option { opacity: 0; pointer-events: none; }
         
-        .milestone-item { padding: 3px 8px; margin-bottom: 1px; border-radius: 4px; display: flex; justify-content: space-between; font-size: 13px; }
+        .milestone-item { padding: 3px 8px; margin-bottom: 1px; border-radius: 4px; display: flex; justify-content: space-between; font-size: 12px; }
         .milestone-active { background: #fbbf24; color: black; font-weight: bold; }
         
-        /* Chỉnh footer bản quyền to và nổi bật hơn */
         .footer-copyright { 
             width: 100%; 
             text-align: center; 
             padding: 16px; 
-            font-size: 18px; /* Tăng cỡ chữ */
-            background: rgba(0,0,0,0.95); 
+            font-size: 18px; 
+            background: rgba(0,0,0,0.9); 
             margin-top: auto; 
             font-weight: 900;
             color: #fbbf24;
-            border-top: 3px solid #3b82f6;
+            border-top: 2px solid #3b82f6;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -80,27 +77,24 @@
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
 
-        input[type="text"], input[type="password"] { color: black; border-radius: 10px; padding: 12px; font-size: 16px; outline: none; border: 2px solid transparent; }
+        input[type="text"] { color: black; border-radius: 10px; padding: 10px; font-size: 16px; outline: none; border: 2px solid transparent; }
+        input:focus { border-color: #fbbf24; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #1e3a8a; border: 4px solid #fbbf24; border-radius: 30px; padding: 30px; max-width: 500px; width: 90%; text-align: center; }
+
+        .history-card { background: #ffffff; color: #1e293b; border-radius: 16px; padding: 18px; border: 1px solid #e2e8f0; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: left; }
+        .choice-correct { background: #dcfce7; border: 2px solid #22c55e; color: #166534; padding: 8px; border-radius: 10px; margin: 4px 0; font-size: 0.95em; font-weight: 700; }
+        .choice-wrong { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 8px; border-radius: 12px; margin: 4px 0; font-size: 0.95em; font-weight: 700; }
+        .choice-neutral { background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; padding: 8px; border-radius: 8px; margin: 4px 0; font-size: 0.95em; }
+        .explanation-box { background: #f0f9ff; border-left: 5px solid #0ea5e9; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 0.9em; color: #0369a1; line-height: 1.5; font-style: italic; }
+
+        .screen-container { flex: 1; display: flex; flex-direction: column; padding: 10px 20px; overflow-y: auto; }
+        .inner-content { max-width: 1000px; width: 100%; margin: 0 auto; }
         .tf-btn { width: 75px; padding: 5px; border-radius: 8px; cursor: pointer; border: 2px solid #fff; transition: 0.3s; font-size: 13px; font-weight: bold; }
         .tf-btn.true { background: #10b981; }
         .tf-btn.false { background: #ef4444; }
         .tf-btn.inactive { opacity: 0.2; filter: grayscale(1); }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #1e3a8a; border: 4px solid #fbbf24; border-radius: 30px; padding: 30px; max-width: 550px; width: 90%; text-align: center; }
-
-        .history-card { background: #ffffff; color: #1e293b; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .choice-correct { background: #dcfce7; border: 2px solid #22c55e; color: #166534; padding: 8px; border-radius: 10px; margin: 5px 0; font-weight: 700; }
-        .choice-wrong { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 8px; border-radius: 12px; margin: 5px 0; font-weight: 700; }
-        .choice-neutral { background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; padding: 8px; border-radius: 8px; margin: 4px 0; }
-        .explanation-box { background: #f0f9ff; border-left: 5px solid #0ea5e9; padding: 12px; margin-top: 10px; border-radius: 4px; font-size: 0.85em; color: #0369a1; line-height: 1.5; font-style: italic; }
-
-        .admin-table { width: 100%; border-collapse: collapse; background: white; color: black; font-size: 13px; min-width: 900px; }
-        .admin-table th, .admin-table td { border: 1px solid #eee; padding: 10px; text-align: left; }
-        .admin-table th { background: #1e3a8a; color: white; position: sticky; top: 0; }
-        
-        .screen-container { flex: 1; display: flex; flex-direction: column; padding: 10px 20px; overflow-y: auto; }
-        .inner-content { max-width: 1000px; width: 100%; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -111,12 +105,11 @@
     <!-- Screen: Info Input -->
     <div id="screen-info" class="screen-container items-center justify-center">
         <div class="inner-content flex flex-col items-center text-white">
-            <h1 class="text-4xl md:text-5xl font-black text-yellow-400 text-center mb-6 uppercase tracking-tighter drop-shadow-2xl font-black">Ai Là Triệu Phú Vật Lí 11</h1>
+            <h1 class="text-4xl md:text-5xl font-black text-yellow-400 text-center mb-5 uppercase tracking-tighter drop-shadow-2xl font-black">Ai Là Triệu Phú Vật Lí 11</h1>
             <div class="bg-blue-900/95 p-6 md:p-8 rounded-[40px] border-4 border-yellow-500 w-full max-w-lg space-y-4 shadow-2xl relative backdrop-blur-sm text-left">
-                <button onclick="window.showAdminLogin()" class="absolute -top-5 -right-5 bg-black w-14 h-14 rounded-full border-4 border-yellow-500 flex items-center justify-center text-xs font-black hover:bg-yellow-500 hover:text-black transition shadow-xl text-white">ADM</button>
-                <p class="text-center text-blue-200 text-xs font-bold uppercase tracking-widest font-black">Thông tin thí sinh</p>
-                <div class="space-y-3">
-                    <div><label class="block mb-1 font-bold text-xs ml-2 uppercase text-blue-100">Họ và tên</label><input type="text" id="input-name" class="w-full h-10" placeholder="Nguyễn Văn A"></div>
+                <p class="text-center text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Thông tin thí sinh</p>
+                <div class="space-y-2">
+                    <div><label class="block mb-1 font-bold text-xs ml-2 uppercase text-blue-100">Họ và tên</label><input type="text" id="input-name" class="w-full h-10" placeholder="Nguyễn Thị Ánh Hà"></div>
                     <div><label class="block mb-1 font-bold text-xs ml-2 uppercase text-blue-100">Số báo danh</label><input type="text" id="input-sbd" class="w-full h-10" placeholder="001"></div>
                     <div><label class="block mb-1 font-bold text-xs ml-2 uppercase text-blue-100">Lớp</label><input type="text" id="input-class" class="w-full h-10" placeholder="11A1"></div>
                     <div><label class="block mb-1 font-bold text-xs ml-2 uppercase text-blue-100">Trường THPT</label><input type="text" id="input-school" class="w-full h-10" placeholder="Nguyễn Trường Tộ"></div>
@@ -127,41 +120,7 @@
                         <button onclick="window.showRules()" class="bg-gray-700 py-2.5 rounded-xl font-bold uppercase text-white shadow-md hover:bg-gray-600 transition text-sm">Thể lệ</button>
                         <button onclick="window.startMode('practice')" class="bg-blue-600 text-white py-2.5 rounded-xl font-bold uppercase shadow-md hover:bg-blue-50 transition text-sm">Luyện tập</button>
                     </div>
-                    <button onclick="window.startMode('exam')" class="w-full bg-yellow-500 text-blue-950 py-3.5 rounded-xl font-black uppercase transition shadow-2xl text-lg border-b-6 border-yellow-700 active:translate-y-1 active:border-b-0">Vào làm bài thi (Anti-Cheat)</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Admin -->
-    <div id="modal-admin-login" class="hidden modal-overlay text-white">
-        <div class="modal-content shadow-[0_0_100px_rgba(251,191,36,0.3)]">
-            <h3 class="text-2xl font-black text-yellow-400 mb-2 uppercase">Bảng Quản Trị</h3>
-            <p class="mb-6 text-blue-100 italic text-sm">Vui lòng xác minh mật khẩu quản trị</p>
-            <input type="password" id="admin-pass-input" class="w-full mb-8 text-center text-3xl tracking-[10px] border-4 border-blue-400" placeholder="••••••">
-            <div class="flex space-x-4">
-                <button onclick="window.hideAdminLogin()" class="flex-1 bg-gray-600 py-3 rounded-xl font-bold uppercase">Hủy</button>
-                <button onclick="window.checkAdminPass()" class="flex-1 bg-green-600 py-3 rounded-xl font-bold uppercase shadow-lg">Xác nhận</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Screen: Admin Panel -->
-    <div id="screen-admin" class="hidden screen-container bg-slate-100 text-black">
-        <div class="inner-content">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b-4 border-blue-900 pb-4 gap-6">
-                <h2 class="text-2xl font-black uppercase text-blue-900 font-bold font-black">📊 Thống Kê Kết Quả</h2>
-                <div class="flex space-x-3 text-white">
-                    <button onclick="window.exportToExcel()" class="bg-green-700 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase shadow-xl hover:bg-green-600 transition">Xuất File .XLSX</button>
-                    <button onclick="window.backToHome()" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase shadow-xl hover:bg-red-500 transition">Thoát</button>
-                </div>
-            </div>
-            <div class="bg-white rounded-[30px] shadow-2xl overflow-hidden border border-slate-200">
-                <div class="overflow-x-auto custom-scrollbar">
-                    <table class="admin-table">
-                        <thead><tr><th>Hạng</th><th>Họ Tên</th><th>SBD</th><th>Lớp</th><th>Trường</th><th>Điểm</th><th>Làm bài (s)</th><th>Nộp lúc</th></tr></thead>
-                        <tbody id="admin-tbody"></tbody>
-                    </table>
+                    <button onclick="window.startMode('exam')" class="w-full bg-yellow-500 text-blue-950 py-3.5 rounded-xl font-black uppercase transition shadow-2xl text-lg border-b-4 border-yellow-700 active:translate-y-1 active:border-b-0">Vào làm bài thi (Anti-Cheat)</button>
                 </div>
             </div>
         </div>
@@ -186,7 +145,7 @@
                     <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                     <div class="mt-auto pt-6 pb-28 flex justify-between items-center text-white">
                          <button onclick="window.confirmQuit()" id="btn-stop" class="hidden bg-red-700 px-6 py-2.5 rounded-xl font-black uppercase text-xs shadow-xl hover:bg-red-600 transition">Dừng chơi</button>
-                         <button onclick="window.submitAnswer()" id="btn-submit" class="ml-auto bg-green-600 px-14 py-3.5 rounded-[20px] font-black uppercase shadow-2xl hover:bg-green-500 transition border-b-4 border-green-800 text-xl tracking-tighter">Nộp bài</button>
+                         <button onclick="window.submitAnswer()" id="btn-submit" class="ml-auto bg-green-600 px-14 py-4 rounded-[25px] font-black uppercase shadow-2xl hover:bg-green-500 transition border-b-4 border-green-800 text-xl tracking-tighter">Nộp bài</button>
                     </div>
                 </div>
             </div>
@@ -207,8 +166,8 @@
     </div>
 
     <!-- Screen: History -->
-    <div id="screen-history" class="hidden screen-container bg-slate-50 text-black border-t-[8px] border-blue-900">
-        <div class="inner-content pb-28 text-black text-left">
+    <div id="screen-history" class="hidden screen-container bg-slate-100 text-black border-t-[8px] border-blue-900">
+        <div class="inner-content pb-28 text-black">
             <h2 class="text-3xl font-black uppercase text-blue-950 text-center py-8 border-b-4 border-blue-900 mb-6 bg-white rounded-b-3xl shadow-md">Lịch Sử Bài Làm Chi Tiết</h2>
             <div id="history-content" class="space-y-10 px-2"></div>
             <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-50">
@@ -229,13 +188,12 @@
                     <li>Câu 11-20: Vận dụng (Tới 10đ).</li>
                 </ul>
                 <p>Thời gian: <strong>180 giây/câu</strong>. Trả lời sai sẽ lùi về mốc điểm an toàn.</p>
-                <p class="text-red-400 font-bold uppercase italic text-sm text-center">Lưu ý bản THI: Chống gian lận sẽ tự động kết thúc bài thi nếu thí sinh rời khỏi màn hình hoặc mở tab khác.</p>
+                <p class="text-red-400 font-bold uppercase italic text-sm text-center">Lưu ý bản THI: Chống gian lận sẽ tự động kết thúc bài thi nếu thí sinh rời khỏi màn hình.</p>
             </div>
-            <button onclick="window.hideRules()" class="mt-8 w-full bg-yellow-500 text-blue-950 py-4 rounded-2xl font-black uppercase shadow-lg">Đã hiểu</button>
+            <button onclick="window.hideRules()" class="mt-8 w-full bg-yellow-500 text-blue-950 py-4 rounded-2xl font-black uppercase shadow-lg text-blue-950">Đã hiểu</button>
         </div>
     </div>
 
-    <!-- Footer bản quyền -->
     <div class="footer-copyright">
         Bản quyền thuộc về thạc sĩ Nguyễn Thị Ánh Hà, THPT Nguyễn Trường Tộ, Thành phố Huế
     </div>
@@ -245,87 +203,74 @@
 <audio id="audio-correct" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
 <audio id="audio-wrong" src="https://assets.mixkit.co/active_storage/sfx/2959/2959-preview.mp3" preload="auto"></audio>
 
-<!-- Firebase & Unified Logic -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+<script>
+    // --- NGÂN HÀNG 40 CÂU HỎI (Bám sát yêu cầu viết hoa/thường) ---
+    const BANK = {
+        mcq: [
+            { q: "Phương trình dao động điều hòa của chất điểm có dạng $x = A\\cos(\\omega t + \\varphi)$. Đại lượng $A$ là", a: "biên độ dao động.", b: "pha dao động.", c: "tần số góc.", d: "chu kì dao động.", ans: "biên độ dao động.", hint: "Biên độ A là độ lệch cực đại so với VTCB.", level: 1 },
+            { q: "Đơn vị của tần số góc $\\omega$ trong hệ SI là gì?", a: "Rad/s.", b: "Hz.", c: "S.", d: "Rad.", ans: "Rad/s.", hint: "Tần số góc đo bằng radian/giây.", level: 1 },
+            { q: "Gia tốc của một vật dao động điều hòa luôn biến thiên như thế nào?", a: "ngược pha với li độ.", b: "cùng pha với li độ.", c: "sớm pha $\\pi/2$ so với vận tốc.", d: "có độ lớn không đổi.", ans: "ngược pha với li độ.", hint: "$a = -\\omega^2 x$.", level: 1 },
+            { q: "Trong dao động điều hòa, vận tốc sớm pha bao nhiêu so với li độ?", a: "$\\pi/2$.", b: "$\\pi$.", c: "$2\\pi$.", d: "0.", ans: "$\\pi/2$.", hint: "Vận tốc sớm pha hơn x một góc $\\pi/2$.", level: 1 },
+            { q: "Chu kì dao động của con lắc lò xo phụ thuộc vào yếu tố nào?", a: "khối lượng m và độ cứng k.", b: "biên độ dao động.", c: "gia tốc trọng trường g.", d: "pha ban đầu.", ans: "khối lượng m và độ cứng k.", hint: "$T = 2\\pi\\sqrt{m/k}$.", level: 2 },
+            { q: "Đồ thị li độ - thời gian của dao động điều hòa là một đường", a: "hình sin.", b: "elip.", c: "parabol.", d: "thẳng.", ans: "hình sin.", hint: "Hàm cosin có dạng sóng hình sin.", level: 1 },
+            { q: "Khi vật đi từ vị trí cân bằng ra vị trí biên, vật chuyển động", a: "chậm dần.", b: "nhanh dần.", c: "nhanh dần đều.", d: "chậm dần đều.", ans: "chậm dần.", hint: "Tốc độ giảm về 0 tại biên.", level: 2 },
+            { q: "Hiện tượng cộng hưởng xảy ra khi tần số ngoại lực cưỡng bức có giá trị", a: "bằng tần số riêng của hệ.", b: "rất lớn so với tần số riêng.", c: "bằng không.", d: "bằng chu kì riêng.", ans: "bằng tần số riêng của hệ.", hint: "Biên độ đạt cực đại khi $f = f_0$.", level: 2 },
+            { q: "Năng lượng cơ năng của vật dao động điều hòa bảo toàn khi nào?", a: "khi bỏ qua mọi ma sát.", b: "vật ở vị trí biên.", c: "biên độ dao động lớn.", d: "vật qua vị trí cân bằng.", ans: "khi bỏ qua mọi ma sát.", hint: "Tổng Wd + Wt là hằng số.", level: 2 },
+            { q: "Trong dao động tắt dần, đại lượng nào sau đây giảm dần theo thời gian?", a: "biên độ và cơ năng.", b: "tần số.", c: "chu kì.", d: "pha ban đầu.", ans: "biên độ và cơ năng.", hint: "Ma sát tiêu hao năng lượng.", level: 1 },
+            { q: "Động năng của vật dao động điều hòa biến thiên tuần hoàn với tần số", a: "gấp đôi tần số li độ.", b: "bằng tần số li độ.", c: "bằng một nửa tần số li độ.", d: "không đổi.", ans: "gấp đôi tần số li độ.", hint: "$f' = 2f$.", level: 3 },
+            { q: "Quãng đường vật đi được trong một chu kì là bao nhiêu?", a: "4A.", b: "2A.", c: "A.", d: "8A.", ans: "4A.", hint: "Vật qua O hai lần và đến 2 biên.", level: 1 },
+            { q: "Pha ban đầu $\\varphi$ cho phép xác định trạng thái vật ở thời điểm", a: "ban đầu t = 0.", b: "kết thúc dao động.", c: "vật qua VTCB.", d: "vật ở biên.", ans: "ban đầu t = 0.", hint: "Xác định trạng thái lúc bắt đầu.", level: 1 },
+            { q: "Gia tốc cực đại của vật dao động điều hòa đạt được tại vị trí nào?", a: "vị trí biên.", b: "vị trí cân bằng.", c: "mọi vị trí.", d: "điểm chính giữa.", ans: "vị trí biên.", hint: "$a = \\omega^2 A$ tại biên.", level: 2 },
+            { q: "Đơn vị của chu kì T trong hệ SI là gì?", a: "Giây (s).", b: "Hz.", c: "m/s.", d: "Rad.", ans: "Giây (s).", hint: "Khoảng thời gian một dao động.", level: 1 },
+            { q: "Lực hồi phục của con lắc lò xo tính bằng công thức nào?", a: "$F = -kx$.", b: "$F = kx$.", c: "$F = ma$.", d: "$F = mg$.", ans: "$F = -kx$.", hint: "Hướng về VTCB.", level: 1 },
+            { q: "Hình chiếu của chuyển động tròn đều lên một đường kính là dao động", a: "điều hòa.", b: "tắt dần.", c: "duy trì.", d: "biến đổi đều.", ans: "điều hòa.", hint: "Mối liên hệ pha.", level: 1 },
+            { q: "Chu kì con lắc đơn không phụ thuộc vào đại lượng nào sau đây?", a: "khối lượng m.", b: "chiều dài l.", c: "gia tốc g.", d: "vị trí địa lí.", ans: "khối lượng m.", hint: "$T = 2\\pi\\sqrt{l/g}$.", level: 2 },
+            { q: "Thế năng của con lắc lò xo tỉ lệ thuận với", a: "bình phương li độ.", b: "li độ bậc nhất.", c: "vận tốc vật.", d: "tần số góc.", ans: "bình phương li độ.", hint: "$W_t = 0,5 kx^2$.", level: 2 },
+            { q: "Một vật thực hiện 20 dao động trong 10 giây. Tần số dao động là", a: "2 Hz.", b: "0,5 Hz.", c: "10 Hz.", d: "20 Hz.", ans: "2 Hz.", hint: "$f = N / t$.", level: 2 },
+            { q: "Vật dao động điều hòa có biên độ 5cm. Quỹ đạo dao động dài bao nhiêu?", a: "10 cm.", b: "5 cm.", c: "20 cm.", d: "2,5 cm.", ans: "10 cm.", hint: "$L = 2A$.", level: 1 },
+            { q: "Khi vật đi từ biên về vị trí cân bằng thì đại lượng nào sau đây tăng?", a: "động năng.", b: "thế năng.", c: "cơ năng.", d: "biên độ.", ans: "động năng.", hint: "Tốc độ vật tăng dần.", level: 2 },
+            { q: "Đồ thị vận tốc - li độ trong dao động điều hòa có dạng đường", a: "elip.", b: "sin.", c: "thẳng.", d: "parabol.", ans: "elip.", hint: "Hệ thức độc lập thời gian.", level: 3 },
+            { q: "Biên độ cưỡng bức không phụ thuộc vào đại lượng nào?", a: "pha ban đầu ngoại lực.", b: "biên độ ngoại lực.", c: "tần số ngoại lực.", d: "lực cản môi trường.", ans: "pha ban đầu ngoại lực.", hint: "Pha không ảnh hưởng độ lớn.", level: 3 }
+        ],
+        tf: [
+            { q: "Xét vật dao động điều hòa quanh vị trí cân bằng O trên trục Ox.", items: [ { t: "Vận tốc hướng về O khi vật đi từ biên về O.", r: true }, { t: "Gia tốc đạt độ lớn cực tiểu tại biên.", r: false }, { t: "Lực kéo về đổi chiều tại vị trí cân bằng.", r: true }, { t: "Vận tốc vật sớm pha $\\pi/2$ so với li độ.", r: true } ], hint: "Gia tốc đạt cực đại tại biên. Vận tốc sớm pha $\\pi/2$.", level: 2 },
+            { q: "Về năng lượng của con lắc lò xo nằm ngang dao động nhỏ.", items: [ { t: "Thế năng đàn hồi tỉ lệ thuận với bình phương li độ.", r: true }, { t: "Động năng bằng cơ năng khi vật ở biên.", r: false }, { t: "Cơ năng bảo toàn nếu bỏ qua mọi lực cản.", r: true }, { t: "Thế năng tăng khi vật ra xa cân bằng.", r: true } ], hint: "Động năng bằng 0 ở biên.", level: 2 },
+            { q: "Nói về dao động cưỡng bức và cộng hưởng.", items: [ { t: "Dao động cưỡng bức f bằng f ngoại lực.", r: true }, { t: "Cộng hưởng xảy ra khi f lực bằng f riêng.", r: true }, { t: "Ma sát nhỏ thì cộng hưởng càng mạnh.", r: true }, { t: "Biên độ đạt giá trị lớn nhất khi cộng hưởng.", r: true } ], hint: "Đặc điểm cộng hưởng.", level: 3 },
+            { q: "Các đại lượng đặc trưng của dao động điều hòa.", items: [ { t: "Chu kì đo bằng giây, tần số đo bằng Hertz.", r: true }, { t: "Biên độ có thể âm.", r: false }, { t: "Tần số góc đơn vị rad/s.", r: true }, { t: "Pha ban đầu phụ thuộc cách kích thích.", r: true } ], hint: "Biên độ luôn dương.", level: 1 },
+            { q: "Xét con lắc đơn dao động với biên độ góc nhỏ.", items: [ { t: "Chu kì tỉ lệ thuận chiều dài dây treo l.", r: false }, { t: "Lực kéo về là một thành phần trọng lực.", r: true }, { t: "Vận tốc vật cực đại tại vị trí thấp nhất.", r: true }, { t: "T tỉ lệ với căn bậc hai của l.", r: true } ], hint: "T không phụ thuộc m.", level: 2 },
+            { q: "Pha và đại lượng động học.", items: [ { t: "Vận tốc sớm pha $\\pi/2$ so li độ.", r: true }, { t: "Gia tốc và li độ ngược pha nhau.", r: true }, { t: "Gia tốc vuông pha với vận tốc.", r: true }, { t: "Pha dao động là hằng số.", r: false } ], hint: "Pha tăng theo thời gian.", level: 3 },
+            { q: "Biến thiên năng lượng theo thời gian.", items: [ { t: "Động năng biến thiên chu kì T/2.", r: true }, { t: "Wt đạt giá trị cực đại tại vị trí biên.", r: true }, { t: "Tổng động năng và thế năng là cơ năng.", r: true }, { t: "Cơ năng biến thiên hình sin.", r: false } ], hint: "Cơ năng là hằng số.", level: 2 },
+            { q: "Hiện tượng cộng hưởng cơ học.", items: [ { t: "Tần số lực bằng tần số riêng của hệ.", r: true }, { t: "Đỉnh cộng hưởng nhọn khi lực cản nhỏ.", r: true }, { t: "Hộp đàn guitar ứng dụng cộng hưởng.", r: true }, { t: "Cộng hưởng cơ luôn có hại cho máy.", r: false } ], hint: "Cộng hưởng có cả lợi và hại.", level: 3 }
+        ],
+        short: [
+            { q: "Vật dao động 10 Hz. Tính chu kì T (giây).", a: "0,1", hint: "T = 1 / f.", level: 1 },
+            { q: "k = 100, m = 1. Tính tần số góc (rad/s).", a: "10", hint: "$\\omega = \\sqrt{k/m}$.", level: 2 },
+            { q: "Biên độ A = 10cm. Tính quãng đường 1 chu kì (cm).", a: "40", hint: "S = 4A.", level: 2 },
+            { q: "Đi từ biên -A đến A hết 0,2s. Tính chu kì T (s).", a: "0,4", hint: "T/2 = 0,2.", level: 3 },
+            { q: "x = 5cos(10t). Tại t = 0 li độ vật là bao nhiêu cm?", a: "5", hint: "Thay t = 0.", level: 1 },
+            { q: "v_max = 50, $\\omega$ = 5. Biên độ A bằng bao nhiêu cm?", a: "10", hint: "A = vmax/w.", level: 2 },
+            { q: "Chu kì T = 2s. Tính tần số f (Hz).", a: "0,5", hint: "f = 1/T.", level: 1 },
+            { q: "k = 50, Wt = 0,25 J. Li độ vật là bao nhiêu cm?", a: "10", hint: "x = 0,1m = 10cm.", level: 3 }
+        ]
+    };
 
-    // --- CONFIG ---
-    const firebaseConfig = JSON.parse(__firebase_config);
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'phys11-millionaire-final-release';
-
-    // Shared Globals
-    window.cloudResults = [];
+    // --- GAME ENGINE STATE ---
     let state = {
         user: {}, questions: [], currentIndex: 0, startTime: 0, timer: 180, timerId: null, history: [],
         lifelines: { '5050': true, 'audience': true, 'phone': true }, isGameActive: false,
         selectedAnswer: null, currentTF: null, fireworksInt: null, mode: 'practice'
     };
 
-    const BANK = {
-        mcq: [
-            { q: "Phương trình dao động điều hòa của chất điểm có dạng $x = A\\cos(\\omega t + \\varphi)$. Đại lượng $A$ là", a: "biên độ dao động.", b: "pha dao động.", c: "tần số góc.", d: "chu kì dao động.", ans: "biên độ dao động.", hint: "Biên độ A là độ lệch cực đại của vật so với VTCB, luôn dương.", level: 1 },
-            { q: "Đơn vị của tần số góc $\\omega$ trong hệ SI là gì?", a: "rad/s.", b: "Hz.", c: "s.", d: "rad.", ans: "rad/s.", hint: "Đo nhịp độ pha quét được trong một giây.", level: 1 },
-            { q: "Gia tốc của một vật dao động điều hòa luôn biến thiên như thế nào?", a: "ngược pha với li độ.", b: "cùng pha với li độ.", c: "trễ pha $\\pi/2$ so với vận tốc.", d: "sớm pha $\\pi/2$ so với li độ.", ans: "ngược pha với li độ.", hint: "$a = -\\omega^2 x$.", level: 1 },
-            { q: "Trong dao động điều hòa, vận tốc sớm pha bao nhiêu so với li độ?", a: "$\\pi/2$.", b: "$\\pi$.", c: "$0$.", d: "$2\\pi$.", ans: "$\\pi/2$.", hint: "Vận tốc là đạo hàm của li độ.", level: 1 },
-            { q: "Một con lắc lò xo có độ cứng $k$ và vật nặng khối lượng $m$. Chu kì dao động là", a: "$2\\pi\\sqrt{m/k}$.", b: "$2\\pi\\sqrt{k/m}$.", c: "$\\sqrt{m/k}$.", d: "$1/(2\\pi)\\sqrt{k/m}$.", ans: "$2\\pi\\sqrt{m/k}$.", hint: "T tỉ lệ thuận căn bậc hai của m.", level: 2 },
-            { q: "Đồ thị li độ - thời gian của dao động điều hòa là một đường", a: "hình sin.", b: "elip.", c: "parabol.", d: "thẳng.", ans: "hình sin.", hint: "Biến thiên tuần hoàn dạng hàm cosin.", level: 1 },
-            { q: "Khi vật đi từ vị trí cân bằng ra vị trí biên, vật chuyển động", a: "chậm dần.", b: "nhanh dần.", c: "nhanh dần đều.", d: "chậm dần đều.", ans: "chậm dần.", hint: "Về biên tốc độ giảm về 0.", level: 2 },
-            { q: "Năng lượng cơ năng của hệ dao động điều hòa bảo toàn khi nào?", a: "bỏ qua mọi ma sát.", b: "tại vị trí biên.", c: "biên độ lớn.", d: "tại VTCB.", ans: "bỏ qua mọi ma sát.", hint: "Hệ kín không hao phí.", level: 2 },
-            { q: "Hiện tượng cộng hưởng cơ học xảy ra khi tần số ngoại lực cưỡng bức", a: "bằng tần số riêng của hệ.", b: "rất lớn so với tần số riêng.", c: "bằng 0.", d: "bằng chu kì riêng.", ans: "bằng tần số riêng của hệ.", hint: "Khi cộng hưởng, biên độ vọt lên giá trị cực đại.", level: 2 },
-            { q: "Động năng của vật dao động điều hòa biến thiên tuần hoàn với tần số", a: "gấp đôi tần số li độ.", b: "bằng tần số li độ.", c: "bằng nửa tần số li độ.", d: "không đổi.", ans: "gấp đôi tần số li độ.", hint: "$f' = 2f$.", level: 3 },
-            { q: "Quãng đường vật đi được trong một chu kì là bao nhiêu?", a: "4A.", b: "2A.", c: "A.", d: "8A.", ans: "4A.", hint: "Vật đi từ A đến -A rồi quay lại.", level: 1 },
-            { q: "Pha ban đầu $\\varphi$ cho phép xác định trạng thái vật ở thời điểm", a: "ban đầu t = 0.", b: "qua VTCB.", c: "kết thúc dao động.", d: "vật đạt cực đại li độ.", ans: "ban đầu t = 0.", hint: "Xác định trạng thái bắt đầu.", level: 1 },
-            { q: "Đơn vị của chu kì T trong hệ SI là gì?", a: "giây (s).", b: "Hertz (Hz).", c: "radian.", d: "m/s.", ans: "giây (s).", hint: "Khoảng thời gian một dao động.", level: 1 },
-            { q: "Gia tốc cực đại của vật đạt được tại vị trí nào?", a: "vị trí biên.", b: "vị trí cân bằng.", c: "mọi vị trí.", d: "điểm chính giữa.", ans: "vị trí biên.", hint: "Khi x đạt cực đại.", level: 2 },
-            { q: "Lực hồi phục tác dụng lên vật có biểu thức đại số là gì?", a: "$F = -kx$.", b: "$F = kx$.", c: "$F = mg$.", d: "$F = 0.5 kx^2$.", ans: "$F = -kx$.", hint: "Dấu trừ chỉ hướng lực luôn hướng về VTCB.", level: 1 },
-            { q: "Chu kì con lắc đơn nhỏ không phụ thuộc vào đại lượng nào?", a: "khối lượng m.", b: "chiều dài l.", c: "gia tốc g.", d: "vị trí địa lí.", ans: "khối lượng m.", hint: "$T = 2\\pi\\sqrt{l/g}$.", level: 2 },
-            { q: "Khi cộng hưởng, đỉnh đồ thị cộng hưởng nhọn nhất khi nào?", a: "lực cản nhỏ.", b: "ma sát lớn.", c: "tần số lớn.", d: "biên độ lớn.", ans: "lực cản nhỏ.", hint: "Lực cản nhỏ làm biên độ cộng hưởng rất cao.", level: 3 },
-            { q: "Vận tốc vật dao động điều hòa đạt giá trị bằng không tại", a: "vị trí biên.", b: "vị trí cân bằng.", c: "mọi vị trí.", d: "giữa biên và VTCB.", ans: "vị trí biên.", hint: "Vật dừng lại để đổi chiều chuyển động.", level: 2 },
-            { q: "Thế năng của con lắc lò xo tỉ lệ với đại lượng nào?", a: "bình phương li độ.", b: "vận tốc.", c: "khối lượng.", d: "tần số.", ans: "bình phương li độ.", hint: "$W_t = 0.5 kx^2$.", level: 2 },
-            { q: "Dao động duy trì là hệ được tác động như thế nào?", a: "bù năng lượng đúng bằng phần mất đi.", b: "tác dụng ngoại lực tuần hoàn.", c: "bỏ qua ma sát.", d: "kích thích biên độ cực đại.", ans: "bù năng lượng đúng bằng phần mất đi.", hint: "Duy trì biên độ không đổi.", level: 2 },
-            { q: "Hình chiếu chuyển động tròn đều là dao động", a: "điều hòa.", b: "tắt dần.", c: "duy trì.", d: "biến đổi đều.", ans: "điều hòa.", hint: "Mối liên hệ pha lượng giác.", level: 1 },
-            { q: "Đồ thị vận tốc - li độ (v-x) trong dao động điều hòa là đường gì?", a: "elip.", b: "sin.", c: "thẳng.", d: "parabol.", ans: "elip.", hint: "Hệ thức độc lập thời gian.", level: 3 },
-            { q: "Đơn vị của tần số f là gì?", a: "Hz.", b: "rad/s.", c: "giây.", d: "m.", ans: "Hz.", hint: "Hertz.", level: 1 },
-            { q: "Vật qua VTCB có tốc độ đạt giá trị nào sau đây?", a: "$\\omega A$.", b: "0.", c: "$\\omega^2 A$.", d: "$A$.", ans: "$\\omega A$.", hint: "Vận tốc cực đại.", level: 2 }
-        ],
-        tf: [
-            { q: "Xét vật dao động điều hòa quanh VTCB O.", items: [ { t: "Vận tốc hướng về O khi vật đi từ biên về O.", r: true }, { t: "Gia tốc có độ lớn cực tiểu tại biên.", r: false }, { t: "Lực kéo về đổi chiều tại vị trí cân bằng.", r: true }, { t: "Vận tốc vật sớm pha $\\pi$ so với li độ.", r: false } ], hint: "Gia tốc đạt cực đại tại biên. Vận tốc sớm pha $\\pi/2$.", level: 2 },
-            { q: "Về năng lượng của con lắc lò xo dao động nhỏ.", items: [ { t: "Thế năng tỉ lệ thuận với bình phương li độ.", r: true }, { t: "Động năng bằng cơ năng khi vật ở biên.", r: false }, { t: "Cơ năng bảo toàn nếu bỏ qua mọi ma sát.", r: true }, { t: "Thế năng tăng khi vật ra xa cân bằng.", r: true } ], hint: "Động năng bằng không ở biên.", level: 2 },
-            { q: "Nói về dao động duy trì và cưỡng bức.", items: [ { t: "Dao động duy trì có tần số bằng tần số riêng.", r: true }, { t: "Dao động cưỡng bức có biên độ phụ thuộc lực cản.", r: true }, { t: "Cộng hưởng xảy ra khi f ngoại lực = f riêng.", r: true }, { t: "Tần số cưỡng bức luôn lớn hơn tần số riêng.", r: false } ], hint: "f cưỡng bức bằng f ngoại lực.", level: 3 },
-            { q: "Các đại lượng đặc trưng của dao động điều hòa.", items: [ { t: "Biên độ có thể âm nếu vật ở bên trái O.", r: false }, { t: "Chu kì đơn vị là giây (s).", r: true }, { t: "Tần số góc có đơn vị radian (rad).", r: false }, { t: "Pha ban đầu phụ thuộc vào cách kích thích.", r: true } ], hint: "Biên độ luôn dương. Tần số góc đơn vị rad/s.", level: 1 },
-            { q: "Đặc điểm con lắc đơn dao động điều hòa.", items: [ { t: "Dây treo dài l ảnh hưởng tới chu kì.", r: true }, { t: "Khối lượng m tỉ lệ thuận chu kì.", r: false }, { t: "Lực kéo về hướng về vị trí thấp nhất.", r: true }, { t: "Gia tốc vật đạt cực đại tại biên.", r: true } ], hint: "Chu kì con lắc đơn không phụ thuộc vào m.", level: 2 },
-            { q: "Về pha trong dao động điều hòa.", items: [ { t: "Vận tốc vuông pha với li độ.", r: true }, { t: "Gia tốc ngược pha với li độ.", r: true }, { t: "Gia tốc vuông pha với vận tốc.", r: true }, { t: "Pha dao động là hằng số theo thời gian.", r: false } ], hint: "Pha tăng dần theo t.", level: 3 },
-            { q: "Biến thiên năng lượng động năng và thế năng.", items: [ { t: "Động năng bằng cơ năng khi vật qua O.", r: true }, { t: "Thế năng đàn hồi tỉ lệ với độ cứng lò xo.", r: true }, { t: "Năng lượng biến thiên với chu kì T.", r: false }, { t: "Động năng tăng thì thế năng giảm.", r: true } ], hint: "Năng lượng biến thiên với chu kì T/2.", level: 2 },
-            { q: "Hiện tượng cộng hưởng cơ học.", items: [ { t: "Biên độ đạt cực đại khi có cộng hưởng.", r: true }, { t: "Xảy ra với hệ dao động tắt dần bất kì.", r: false }, { t: "Cộng hưởng có lợi trong hộp đàn ghita.", r: true }, { t: "Đỉnh cộng hưởng cao nhất khi ma sát nhỏ nhất.", r: true } ], hint: "Xảy ra với hệ dao động cưỡng bức.", level: 3 }
-        ],
-        short: [
-            { q: "Vật dao động 10 Hz. Tính chu kì T (giây).", a: "0,1", hint: "T = 1 / f.", level: 1 },
-            { q: "k = 100, m = 1. Tính tần số góc (rad/s).", a: "10", hint: "$\omega = \sqrt{k/m}$.", level: 2 },
-            { q: "Biên độ A = 10cm. Tính quãng đường 1 chu kì (cm).", a: "40", hint: "S = 4A.", level: 2 },
-            { q: "Đi từ biên -A đến A hết 0,2s. Tính T (s).", a: "0,4", hint: "T/2 = 0,2.", level: 3 },
-            { q: "x = 4cos(10t). Tại t = 0 li độ là bao nhiêu cm?", a: "4", hint: "Thay t = 0.", level: 1 },
-            { q: "v_max = 50, $\\omega$ = 5. Biên độ A bằng bao nhiêu cm?", a: "10", hint: "A = vmax/w.", level: 2 },
-            { q: "Chu kì T = 2s. Tính tần số f (Hz).", a: "0,5", hint: "f = 1/T.", level: 1 },
-            { q: "k = 50, Wt = 0.25 J. Li độ là bao nhiêu cm?", a: "10", hint: "x = 0,1m.", level: 3 }
-        ]
-    };
+    const MILESTONES = Array.from({length: 20}, (_, i) => {
+        const qNum = 20 - i;
+        let pts = qNum <= 5 ? qNum : (qNum <= 10 ? 5 + (qNum - 5) * 0.4 : 7 + (qNum - 10) * 0.3);
+        return { q: qNum, pts: parseFloat(pts.toFixed(2)), label: `${pts.toFixed(1)} đ`, special: qNum === 5 ? 'milestone-5' : (qNum === 10 ? 'milestone-10' : (qNum === 20 ? 'milestone-20' : '')) };
+    });
 
-    // --- SHARED GLOBALS EXPOSED TO WINDOW ---
+    // --- GLOBAL FUNCTIONS ATTACHED TO WINDOW (FIX FOR CLICK ISSUE) ---
     window.playSound = (id) => {
         const el = document.getElementById('audio-' + id);
         if (el) { el.currentTime = 0; el.play().catch(()=>{}); }
-    };
-
-    window.saveResultToCloud = async (data) => {
-        try {
-            const scoresCol = collection(db, 'artifacts', appId, 'public', 'data', 'results');
-            await addDoc(scoresCol, { ...data, timestamp: Date.now(), submittedAt: new Date().toLocaleString('vi-VN', {hour12: false}) });
-        } catch (e) { console.error("Firebase Error:", e); }
     };
 
     window.initUser = () => {
@@ -342,45 +287,13 @@
     window.showRules = () => { window.playSound('click'); document.getElementById('rules-overlay').classList.remove('hidden'); };
     window.hideRules = () => { document.getElementById('rules-overlay').classList.add('hidden'); };
 
-    window.showAdminLogin = () => { window.playSound('click'); document.getElementById('modal-admin-login').classList.remove('hidden'); document.getElementById('admin-pass-input').focus(); };
-    window.hideAdminLogin = () => { document.getElementById('modal-admin-login').classList.add('hidden'); document.getElementById('admin-pass-input').value = ""; };
-    window.checkAdminPass = () => { 
-        if(document.getElementById('admin-pass-input').value === "admin123") {
-            window.hideAdminLogin();
-            document.getElementById('screen-info').classList.add('hidden');
-            document.getElementById('screen-admin').classList.remove('hidden');
-            window.renderAdminTable();
-        } else alert("Mật khẩu không chính xác!");
-    };
-
-    window.renderAdminTable = () => {
-        const b = document.getElementById('admin-tbody'); b.innerHTML = '';
-        const data = window.cloudResults || [];
-        if (data.length === 0) { b.innerHTML = '<tr><td colspan="8" class="text-center p-8 italic text-gray-400">Đang tải dữ liệu thí sinh...</td></tr>'; return; }
-        data.sort((x,y)=>y.score-x.score || x.duration-y.duration).forEach((it, i) => {
-            b.innerHTML += `<tr class="border-b transition hover:bg-blue-50"><td>${i+1}</td><td class="font-bold text-blue-900">${it.name}</td><td>${it.sbd}</td><td>${it.class}</td><td>${it.school}</td><td class="font-black text-red-600">${it.score.toFixed(1)}</td><td>${it.duration}</td><td class="text-[10px] text-gray-500">${it.submittedAt}</td></tr>`;
-        });
-    };
-
-    window.exportToExcel = () => {
-        if (!window.cloudResults || window.cloudResults.length === 0) return alert("Không có dữ liệu!");
-        const sorted = [...window.cloudResults].sort((x,y)=>y.score-x.score || x.duration-y.duration);
-        const worksheetData = sorted.map((it, i) => ({
-            "Hạng": i + 1, "Họ Tên": it.name, "Số báo danh": it.sbd, "Lớp": it.class, "Trường": it.school, "Điểm": it.score, "Thời lượng làm bài (s)": it.duration, "Thời điểm nộp": it.submittedAt
-        }));
-        const ws = XLSX.utils.json_to_sheet(worksheetData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Kết quả");
-        XLSX.writeFile(wb, "ket_qua_vat_li_11.xlsx");
-    };
-
     window.startMode = (mode) => {
         state.mode = mode;
         const n = document.getElementById('input-name').value.trim();
         const s = document.getElementById('input-sbd').value.trim();
         const c = document.getElementById('input-class').value.trim();
         const sc = document.getElementById('input-school').value.trim();
-        if (!n || !s || !c || !sc) return alert("Vui lòng nhập đủ thông tin!");
+        if (!n || !s || !c || !sc) return alert("Vui lòng nhập đầy đủ thông tin!");
         state.user = { name: n, sbd: s, class: c, school: sc };
         localStorage.setItem('millionaire_physics_user', JSON.stringify(state.user));
         window.playSound('click');
@@ -409,8 +322,8 @@
             state.isGameActive = false; 
             window.removeEventListener('blur', window.onViolation, true);
             document.removeEventListener('visibilitychange', window.onViolation, true);
-            document.getElementById('question-box').innerHTML = "<h2 class='text-red-500 text-2xl font-black uppercase'>BÀI THI BỊ HỦY DO VI PHẠM QUY CHẾ RỜI MÀN HÌNH</h2>";
-            alert("VI PHẠM QUY CHẾ: Hệ thống phát hiện bạn đã rời khỏi màn hình thi!");
+            document.getElementById('question-box').innerHTML = "<h2 class='text-red-500 text-2xl font-black uppercase tracking-widest'>BÀI THI BỊ HỦY DO VI PHẠM RỜI MÀN HÌNH</h2>";
+            alert("VI PHẠM QUY CHẾ: Hệ thống phát hiện hành vi rời khỏi màn hình thi!");
             gameOver("Vi phạm quy chế rời màn hình");
         }
     };
@@ -420,11 +333,13 @@
         clearInterval(state.timerId); state.timer = 180;
         document.getElementById('timer').innerText = state.timer + 's';
         state.timerId = setInterval(() => { state.timer--; document.getElementById('timer').innerText = state.timer + 's'; if (state.timer <= 0) gameOver("Hết thời gian!"); }, 1000);
+        
         const q = state.questions[state.currentIndex];
-        document.getElementById('question-text').innerHTML = q.q;
+        document.getElementById('question-text').innerHTML = `Câu ${state.currentIndex + 1}: ${q.q}`;
         document.getElementById('help-hint-box').classList.add('hidden');
         const container = document.getElementById('answers-container'); container.innerHTML = '';
         document.getElementById('btn-stop').classList.toggle('hidden', state.currentIndex < 5);
+
         if (q.type === 'mcq') {
             const opts = [q.a, q.b, q.c, q.d].sort(() => 0.5 - Math.random());
             opts.forEach((opt, idx) => {
@@ -443,7 +358,8 @@
                 row.querySelector('.true').onclick = () => { window.playSound('click'); state.currentTF[i] = true; row.querySelector('.true').classList.remove('inactive'); row.querySelector('.false').classList.add('inactive'); };
                 row.querySelector('.false').onclick = () => { window.playSound('click'); state.currentTF[i] = false; row.querySelector('.false').classList.remove('inactive'); row.querySelector('.true').classList.add('inactive'); };
             });
-        } else container.innerHTML = `<div class="w-full col-span-2 bg-blue-900/40 p-8 rounded-3xl text-center"><p class="text-sm text-yellow-300 mb-4 italic font-bold">Nhập đáp án (Dùng dấu phẩy cho số thập phân)</p><input type="text" id="short-input" maxlength="10" class="w-full max-w-xs text-center font-black text-3xl py-4 border-4 border-yellow-500" placeholder="..."></div>`;
+        } else container.innerHTML = `<div class="w-full col-span-2 bg-blue-900/40 p-6 rounded-3xl text-center"><p class="text-sm text-yellow-300 mb-3 italic font-bold">Nhập đáp án (Dùng dấu phẩy cho số thập phân)</p><input type="text" id="short-input" maxlength="10" class="w-full max-w-xs text-center font-black text-3xl py-4 border-4 border-yellow-500" placeholder="..."></div>`;
+        
         if (window.MathJax) MathJax.typesetPromise();
         updateHeader(); renderSidebar();
         document.querySelector('#screen-game .overflow-y-auto').scrollTop = 0;
@@ -495,11 +411,12 @@
         
         let fs = 0; const dur = Math.floor((Date.now() - state.startTime) / 1000);
         if (win) fs = 10.0;
-        else if (reason.includes("Dừng")) { fs = state.currentIndex >= 10 ? 7.0 : (state.currentIndex >= 5 ? 5.0 : 0.0); }
-        else if (reason.includes("Vi phạm")) { fs = state.currentIndex >= 10 ? 7.0 : (state.currentIndex >= 5 ? 5.0 : 0.0); }
-        else { fs = state.currentIndex < 5 ? 0.0 : (state.currentIndex < 10 ? 5.0 : 7.0); }
-        
-        if (state.mode === 'exam') await window.saveResultToCloud({ name: state.user.name, sbd: state.user.sbd, class: state.user.class, school: state.user.school, score: fs, duration: dur });
+        else if (reason.includes("Dừng")) { 
+            const idx = state.currentIndex;
+            fs = idx >= 10 ? 7.0 : (idx >= 5 ? 5.0 : 0.0);
+        } else {
+            fs = state.currentIndex < 5 ? 0.0 : (state.currentIndex < 10 ? 5.0 : 7.0);
+        }
         
         let rank = fs === 10 ? "Xuất sắc" : (fs >= 8 ? "Tốt" : (fs >= 5 ? "Khá" : "Cần cố gắng"));
         document.getElementById('screen-game').classList.add('hidden');
@@ -507,14 +424,15 @@
         
         document.getElementById('result-message').innerHTML = `
             <div class="space-y-4">
-                <p class="text-xl font-bold text-yellow-400 uppercase border-b-2 border-white/20 pb-2 font-black">${reason.includes("Vi phạm") ? 'BÀI THI BỊ HỦY' : 'KẾT QUẢ'}</p>
-                <p class="text-lg">Chúc mừng Triệu phú tri thức <b>${state.user.name}</b>, SBD: <b>${state.user.sbd}</b>, Lớp: <b>${state.user.class}</b>, Trường: <b>${state.user.school}</b></p>
-                <div class="py-4">
-                    <p class="text-base text-blue-200">Đã hoàn thành với số điểm</p>
-                    <p class="text-[95px] font-black text-yellow-400 drop-shadow-2xl leading-none my-2 font-black">${fs.toFixed(1)}</p>
-                    <p class="text-3xl font-black text-green-400 uppercase tracking-widest font-black">Xếp loại: ${rank}</p>
+                <p class="text-2xl font-bold text-yellow-400 uppercase border-b-2 border-white/20 pb-4 font-black">${reason.includes("Vi phạm") ? 'BÀI THI BỊ HỦY' : 'KẾT QUẢ PHẦN THI'}</p>
+                <p class="text-xl">Chúc mừng Triệu phú tri thức <b>${state.user.name}</b></p>
+                <p class="text-lg opacity-90">SBD: <b>${state.user.sbd}</b> | Lớp: <b>${state.user.class}</b> | Trường: <b>${state.user.school}</b></p>
+                <div class="py-6 border-y border-white/10 my-4">
+                    <p class="text-lg text-blue-200">Đã hoàn thành với số điểm</p>
+                    <p class="text-[100px] font-black text-yellow-400 drop-shadow-2xl leading-none my-2 font-black">${fs.toFixed(1)}</p>
+                    <p class="text-4xl font-black text-green-400 uppercase tracking-widest font-black">Xếp loại: ${rank}</p>
                 </div>
-                <p class="mt-2 italic text-xs text-blue-100">"Bạn có thể làm lại để khẳng định đẳng cấp của mình"</p>
+                <p class="mt-4 italic text-sm text-blue-100">"Bạn có thể làm lại để khẳng định đẳng cấp của mình"</p>
             </div>`;
         if (fs >= 5) startFireworks();
         window.scrollTo(0, 0);
@@ -535,9 +453,9 @@
             } else if (h.qData.type === 'tf') {
                 h.qData.items.forEach((it, i) => {
                     const cr = h.userChoice[i] === it.r;
-                    html += `<div class="flex justify-between items-center p-3 border-b ${cr?'text-green-700 bg-green-50':'text-red-700 bg-red-50'}"><span>${String.fromCharCode(97+i)}) ${it.t}</span><b>${it.r?'ĐÚNG':'SAI'} | Chọn: ${h.userChoice[i]?'Đ':'S'}</b></div>`;
+                    html += `<div class="flex justify-between items-center p-3 border-b ${cr?'text-green-700 bg-green-50':'text-red-700 bg-red-50'}"><span>${String.fromCharCode(97+i)}) ${it.t}</span><b>${it.r?'ĐÚNG':'SAI'} | Bạn: ${h.userChoice[i]?'Đ':'S'}</b></div>`;
                 });
-            } else html += `<div class="${h.isCorrect?'choice-correct':'choice-wrong'}">Chọn: ${h.userChoice} | Đáp án: ${h.qData.a}</div>`;
+            } else html += `<div class="${h.isCorrect?'choice-correct':'choice-wrong'}">Lựa chọn: ${h.userChoice} | Đáp án: ${h.qData.a}</div>`;
             html += `<div class="explanation-box"><b>Phân tích khoa học:</b> ${h.qData.hint}</div>`;
             card.innerHTML = html; cont.appendChild(card);
         });
@@ -548,7 +466,7 @@
     window.backToHome = () => { stopFireworks(); document.querySelectorAll('.screen-container, #screen-game, #screen-result, #screen-history').forEach(s => s.classList.add('hidden')); document.getElementById('screen-info').classList.remove('hidden'); window.initUser(); };
     window.backToResult = () => { window.playSound('click'); document.getElementById('screen-history').classList.add('hidden'); document.getElementById('screen-result').classList.remove('hidden'); };
     window.resetGame = () => { window.backToHome(); };
-    window.confirmQuit = () => { if(confirm("Dừng chơi để bảo toàn điểm?")) gameOver("Dừng bài"); };
+    window.confirmQuit = () => { if(confirm("Dừng chơi để bảo toàn điểm số?")) gameOver("Dừng bài"); };
 
     window.use5050 = () => { if (!state.lifelines['5050'] || state.currentIndex >= 12 || state.questions[state.currentIndex].type !== 'mcq') return; state.lifelines['5050'] = false; const q = state.questions[state.currentIndex]; Array.from(document.querySelectorAll('.option-btn')).filter(b => b.dataset.choice !== q.ans).sort(()=>0.5-Math.random()).slice(0, 2).forEach(b => b.classList.add('hidden-option')); updateHeader(); };
     window.useAudience = () => { if(!state.lifelines['audience']) return; state.lifelines['audience'] = false; document.getElementById('help-hint-box').classList.remove('hidden'); document.getElementById('help-hint-box').innerHTML = `<b>Khán giả gợi ý:</b> Đáp án có vẻ như là "<i>${state.questions[state.currentIndex].ans}</i>" (89%)`; updateHeader(); };
@@ -577,8 +495,8 @@
     };
     const stopFireworks = () => { clearInterval(state.fireworksInt); document.getElementById('fireworks-canvas').style.display = 'none'; };
 
-    // Initialization
-    onAuthStateChanged(auth, (u) => { if(u) window.initUser(); });
+    // Initialization trigger
+    document.addEventListener('DOMContentLoaded', window.initUser);
 </script>
 
 </body>
