@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Bảng xếp hạng</title>
+
+  <!-- Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    table { border-collapse: collapse; width: 100%; background: white; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+    th { background: #007bff; color: white; }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      background: green;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover { background: darkgreen; }
+  </style>
+</head>
+
+<body>
+
+<h1>📊 Bảng xếp hạng thí sinh</h1>
+
+<button onclick="loadData()">🔄 Tải dữ liệu</button>
+<button onclick="exportExcel()">📥 Xuất Excel</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Họ tên</th>
+      <th>SBD</th>
+      <th>Lớp</th>
+      <th>Trường</th>
+      <th>Điểm</th>
+      <th>Thời gian (s)</th>
+      <th>Thời gian nộp</th>
+    </tr>
+  </thead>
+  <tbody id="table-body"></tbody>
+</table>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInAnonymously 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAuy5jsRqN-oQWEq53YEJHY5xTcUzMyld0",
+  authDomain: "vl11-tudien11.firebaseapp.com",
+  projectId: "vl11-tudien11",
+  storageBucket: "vl11-tudien11.firebasestorage.app",
+  messagingSenderId: "368811117039",
+  appId: "1:368811117039:web:2e6a73abc00c25f59c4e1a",
+  measurementId: "G-7B6WMBH22W"
+};
+
+// INIT
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// CHECK LOGIN
+onAuthStateChanged(auth, (user) => {
+  const statusEl = document.getElementById('db-status');
+  if (user) {
+    if (statusEl) {
+      statusEl.innerText = "Đã kết nối Firebase";
+      statusEl.className = "admin-status status-connected";
+    }
+  } else {
+    signInAnonymously(auth).catch(e => {
+      if (statusEl) {
+        statusEl.innerText = "Lỗi: " + e.message;
+        statusEl.className = "admin-status status-error";
+      }
+    });
+  }
+});
+
+// SAVE DATA
+window.saveToFirestore = async (data) => {
+  try {
+    if (!auth.currentUser) await signInAnonymously(auth);
+    await addDoc(collection(db, 'results'), data);
+  } catch (e) {
+    console.error("Firestore Save Error:", e);
+  }
+};
+
+// LOAD ADMIN DATA
+window.fetchAdminData = async () => {
+  try {
+    if (!auth.currentUser) await signInAnonymously(auth);
+    const snapshot = await getDocs(query(collection(db, 'results')));
+    return snapshot.docs.map(doc => doc.data());
+  } catch (e) {
+    console.error("Firestore Fetch Error:", e);
+    return [];
+  }
+};
+</script>
